@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="sunset">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raja Sodani : Software Developer</title>
+  <meta name="description" content="Raja Sodani builds search infrastructure, event driven systems, and LLM powered workflows. Try the live system demos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    // set light/dark before first paint: saved choice wins, else system preference
+    (function () {
+      try {
+        var m = localStorage.getItem("mode-v2") ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        if (m === "light") document.documentElement.setAttribute("data-mode", "light");
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23100b07'/><circle cx='50' cy='50' r='15' fill='%23fb923c'/><circle cx='50' cy='50' r='30' fill='none' stroke='%23fb923c' stroke-opacity='0.4' stroke-width='7'/></svg>" />
+</head>
+<body>
+
+  <div class="noise" aria-hidden="true"></div>
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <a href="#top" class="nav-logo mono">raja<span class="pulse-dot logo-dot" aria-hidden="true"></span><span class="accent">dev</span></a>
+    <nav class="nav-links">
+      <a href="#demos">Demos</a>
+      <a href="#work">Work</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <button class="kbd-hint mono" id="paletteOpen" aria-label="Open command palette">⌘K</button>
+      <button class="kbd-hint mono" id="modeToggle" aria-label="Toggle light and dark mode">☀</button>
+      <div class="theme-dots" role="group" aria-label="Color theme">
+        <button class="tdot" data-settheme="sunset"  style="--c:#fb923c" aria-label="Sunset theme"></button>
+        <button class="tdot" data-settheme="cyan"    style="--c:#22d3ee" aria-label="Cyan theme"></button>
+        <button class="tdot" data-settheme="violet"  style="--c:#a78bfa" aria-label="Violet theme"></button>
+        <button class="tdot" data-settheme="emerald" style="--c:#34d399" aria-label="Emerald theme"></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ COMMAND PALETTE ============ -->
+  <div class="palette-backdrop" id="paletteBackdrop" hidden>
+    <div class="palette" role="dialog" aria-label="Command palette">
+      <input type="text" id="paletteInput" class="mono" placeholder="Type a command or search…" autocomplete="off" />
+      <ul id="paletteList"></ul>
+      <p class="palette-foot mono">↑↓ navigate · ↵ select · esc close</p>
+    </div>
+  </div>
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <p class="hero-eyebrow mono reveal"><span class="pulse-dot"></span> AVAILABLE FOR HIRE · REMOTE / ON-SITE / RELOCATION</p>
+      <h1 class="hero-title reveal">
+        Software developer<br />
+        who <span class="hero-word gradient-text" id="heroWord">measures</span><span class="hero-caret" aria-hidden="true"></span><br />
+        everything.
+      </h1>
+      <p class="hero-sub reveal">
+        I'm <strong>Raja Sodani</strong>. I build search that answers in milliseconds, queues that never lose a
+        message, and LLM pipelines that erase weeks of manual work. All in production, for enterprise legal teams
+        at ICICI Bank, Bajaj Finserv, and Emcure Pharma.
+      </p>
+      <div class="hero-actions reveal">
+        <a href="#demos" class="btn btn-primary">Try my systems live ↓</a>
+        <a href="resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener">Resume ↗</a>
+        <button class="btn btn-ghost mono" data-palette>⌘K</button>
+      </div>
+    </section>
+
+    <!-- marquee -->
+    <div class="marquee reveal" aria-hidden="true">
+      <div class="marquee-track mono" id="marqueeTrack">
+        <span>Node.js</span><span>·</span><span>TypeScript</span><span>·</span><span>Elasticsearch</span><span>·</span>
+        <span>RabbitMQ</span><span>·</span><span>Redis</span><span>·</span><span>PostgreSQL</span><span>·</span>
+        <span>MongoDB</span><span>·</span><span>Docker</span><span>·</span><span>AWS</span><span>·</span>
+        <span>Claude API</span><span>·</span><span>React</span><span>·</span><span>Vue</span><span>·</span>
+        <span>Next.js</span><span>·</span><span>Python</span><span>·</span><span>C++</span><span>·</span>
+      </div>
+    </div>
+
+    <!-- ============ BENTO ============ -->
+    <section class="section" id="about">
+      <div class="bento">
+        <article class="cell cell-wide spot reveal">
+          <h3 class="cell-kicker mono">// the short version</h3>
+          <p class="cell-big">
+            Intern → full time in 6 months at <strong>Provakil</strong>. I own the search layer,
+            the messaging infra, and the LLM pipelines on a legal tech platform used by
+            <strong>15K+ people daily</strong>.
+          </p>
+        </article>
+        <article class="cell spot reveal">
+          <h3 class="cell-kicker mono">// search</h3>
+          <p class="cell-stat mono">&lt;1s</p>
+          <p class="cell-note">across 500K+ legal documents, down from minutes</p>
+        </article>
+        <article class="cell spot reveal">
+          <h3 class="cell-kicker mono">// reliability</h3>
+          <p class="cell-stat mono">0.01%</p>
+          <p class="cell-note">upload error rate, down from ~1%, a 100× improvement</p>
+        </article>
+        <article class="cell spot reveal">
+          <h3 class="cell-kicker mono">// messaging</h3>
+          <p class="cell-stat mono">100K+</p>
+          <p class="cell-note">WhatsApp notifications a month, with DLQs and idempotent retries</p>
+        </article>
+        <article class="cell spot reveal">
+          <h3 class="cell-kicker mono">// llm pipelines</h3>
+          <p class="cell-stat mono">2wk→6h</p>
+          <p class="cell-note">client onboarding via hybrid Elasticsearch + LLM matching over 3Cr+ cases</p>
+        </article>
+        <article class="cell spot reveal">
+          <h3 class="cell-kicker mono">// education</h3>
+          <p class="cell-note"><strong>B.Tech CSE</strong>, LNMIIT Jaipur<br />2021 - 2025</p>
+        </article>
+        <article class="cell cell-cta spot reveal">
+          <h3 class="cell-kicker mono">// elsewhere</h3>
+          <div class="cell-links">
+            <a href="https://github.com/RajaSodani" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://linkedin.com/in/raja-sodani11" target="_blank" rel="noopener">LinkedIn ↗</a>
+            <a href="mailto:sodani.raja11@gmail.com">Email ↗</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ LIVE DEMOS ============ -->
+    <section class="section" id="demos">
+      <h2 class="section-title reveal"><span class="mono section-num">01</span>Play with my work</h2>
+      <p class="section-sub reveal">Don't take the resume's word for it. These widgets simulate the systems I run in production: break the queue, out-spam my rate limiter, race the search index, and feed garbage to the LLM pipeline.</p>
+
+      <!-- queue demo -->
+      <div class="demo spot reveal">
+        <header class="demo-head">
+          <div>
+            <h3>QueueViz <span class="mono demo-tag">simulates: RabbitMQ notification service</span></h3>
+            <p class="demo-desc">Messages flow from the API through the exchange to consumers. Kill a consumer and watch retries route to the dead letter queue, then watch it heal and drain. Nothing gets lost.</p>
+          </div>
+          <div class="demo-controls">
+            <button class="btn btn-small" id="burstBtn">Send burst</button>
+            <button class="btn btn-small btn-danger" id="chaosBtn">Kill a consumer</button>
+          </div>
+        </header>
+        <div class="pipe" id="pipe">
+          <div class="pipe-node pipe-producer">
+            <span class="mono">API</span>
+          </div>
+          <div class="pipe-lines">
+            <div class="pipe-lane" data-lane="0">
+              <div class="lane-track"></div>
+              <div class="pipe-consumer" data-consumer="0"><span class="mono">worker-1</span></div>
+            </div>
+            <div class="pipe-lane" data-lane="1">
+              <div class="lane-track"></div>
+              <div class="pipe-consumer" data-consumer="1"><span class="mono">worker-2</span></div>
+            </div>
+            <div class="pipe-lane" data-lane="2">
+              <div class="lane-track"></div>
+              <div class="pipe-consumer" data-consumer="2"><span class="mono">worker-3</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="pipe-stats mono">
+          <span>delivered <b id="statDone">0</b></span>
+          <span>retried <b id="statRetry">0</b></span>
+          <span>in DLQ <b id="statDlq">0</b></span>
+          <span id="statHealth" class="stat-ok">● all consumers healthy</span>
+        </div>
+      </div>
+
+      <!-- rate limiter demo -->
+      <div class="demo spot reveal">
+        <header class="demo-head">
+          <div>
+            <h3>RateLimit Arena <span class="mono demo-tag">simulates: API gateway token bucket</span></h3>
+            <p class="demo-desc">Every API I ship is rate limited. You get a bucket of 10 tokens, refilling 2 per second. Spam the button as fast as you can. Once you run dry it's 429s, and the backend never feels a thing. Try to beat the bucket.</p>
+          </div>
+          <div class="demo-controls">
+            <button class="btn btn-small" id="rlSend">Send request</button>
+            <button class="btn btn-small btn-danger" id="rlBot">Unleash bot traffic</button>
+          </div>
+        </header>
+        <div class="bucket" id="bucket" aria-label="Token bucket"></div>
+        <div class="rl-readout mono">
+          <span>tokens <b id="rlTokens">10</b>/10</span>
+          <span class="rl-ok">200 OK <b id="rl200">0</b></span>
+          <span class="rl-bad">429 <b id="rl429">0</b></span>
+          <span id="rlMsg">bucket full. fire away</span>
+        </div>
+        <ul class="rl-log mono" id="rlLog"></ul>
+      </div>
+      <!-- search demo -->
+      <div class="demo spot reveal">
+        <header class="demo-head">
+          <div>
+            <h3>SearchLab <span class="mono demo-tag">simulates: Elasticsearch legal search</span></h3>
+            <p class="demo-desc">One query, two engines racing over 500,000 documents: a naive full scan vs the inverted index I actually run. Typos welcome, try <b class="mono">bnak</b>.</p>
+          </div>
+        </header>
+        <div class="search-box">
+          <span class="mono search-prompt">⌕</span>
+          <input type="text" id="searchInput" placeholder='Try "bank", "tax", "bnak" (yes, with the typo)…' autocomplete="off" />
+        </div>
+        <div class="qpipe mono" id="qpipe">
+          <span class="pstep">tokenize</span><i>→</i>
+          <span class="pstep">inverted index</span><i>→</i>
+          <span class="pstep">BM25 score</span><i>→</i>
+          <span class="pstep">rank</span>
+        </div>
+        <div class="race">
+          <div class="race-lane">
+            <div class="race-head mono"><span class="race-label">⚡ with inverted index</span><span class="race-latency" id="esLatency"></span></div>
+            <div class="race-bar"><div class="race-fill race-fill-fast" id="esFill"></div></div>
+            <div class="race-note mono" id="esNote">idle</div>
+          </div>
+          <div class="race-lane">
+            <div class="race-head mono"><span class="race-label">🐌 naive full scan</span><span class="race-latency race-latency-slow" id="scanLatency"></span></div>
+            <div class="race-bar"><div class="race-fill race-fill-slow" id="scanFill"></div></div>
+            <div class="race-note mono" id="scanNote">idle</div>
+          </div>
+        </div>
+        <div class="race-verdict mono" id="raceVerdict"></div>
+        <ul class="search-results" id="searchResults"></ul>
+      </div>
+
+      <!-- llm extraction demo -->
+      <div class="demo spot reveal">
+        <header class="demo-head">
+          <div>
+            <h3>ExtractLab <span class="mono demo-tag">simulates: LLM document template engine</span></h3>
+            <p class="demo-desc">Pick a document (including a garbled OCR scan) and run it through the extraction pipeline. When the model returns invalid data, schema validation catches it and retries with feedback. That loop is how my production template engine survives 40+ client formats.</p>
+          </div>
+          <div class="demo-controls">
+            <button class="btn btn-small" id="runExtract">Run pipeline ▸</button>
+          </div>
+        </header>
+        <div class="doc-tabs" id="docTabs">
+          <button class="doc-tab mono active" data-doc="0">court notice · clean</button>
+          <button class="doc-tab mono" data-doc="1">scanned judgment · OCR 71%</button>
+          <button class="doc-tab mono" data-doc="2">client template · custom format</button>
+        </div>
+        <div class="extract-grid">
+          <pre class="extract-src mono" id="extractSrc"></pre>
+          <div class="extract-out">
+            <div class="stages mono" id="stages">
+              <span class="stage">chunk</span><i>→</i>
+              <span class="stage">prompt</span><i>→</i>
+              <span class="stage">claude</span><i>→</i>
+              <span class="stage">validate schema</span>
+            </div>
+            <pre class="extract-json mono" id="extractJson"><span class="j-idle">// structured output appears here. Hit “Run pipeline”</span></pre>
+            <div class="extract-foot mono" id="extractFoot"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ WORK ============ -->
+    <section class="section" id="work">
+      <h2 class="section-title reveal"><span class="mono section-num">02</span>Work</h2>
+      <p class="section-sub reveal">Every card is a real production system. Click one for the story: the problem, what I built, and what changed.</p>
+      <div class="work-list">
+
+        <article class="work-card spot reveal">
+          <header class="work-head">
+            <div>
+              <h3>Software Developer</h3>
+              <p class="company mono">Provakil Technologies · Pune</p>
+            </div>
+            <span class="period mono">Jul 2025 - Present</span>
+          </header>
+          <p class="work-lede">Own the search, messaging, and LLM infrastructure on an enterprise legal platform used by 15K+ people daily.</p>
+          <div class="impact-grid">
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">min → &lt;1s</span>
+                <p>Elasticsearch search service across <strong>500K+ legal documents</strong>, for 15K+ daily users</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Lawyers were waiting minutes per query across a growing corpus of case files, long enough that many kept side spreadsheets instead of trusting the platform.</p>
+                <p><span class="story-label">built</span>A dedicated Elasticsearch service with custom analyzers, filtered queries, and relevance tuning for legal citations and case metadata.</p>
+                <p><span class="story-label">impact</span>Sub-second results across <strong>500K+ documents</strong> for <strong>15K+ daily users</strong>. Search went from the platform's biggest complaint to its selling point.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">2wk → 6h</span>
+                <p>Hybrid Elasticsearch + LLM onboarding pipeline over a <strong>3Cr+ case dataset</strong></p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Every new enterprise client meant 2 weeks of an ops team manually matching records against a 3Cr+ (30M+) case dataset. Onboarding was the bottleneck on revenue.</p>
+                <p><span class="story-label">built</span>A hybrid pipeline: Elasticsearch does fast candidate matching at scale, then an LLM resolves the ambiguous cases a human used to eyeball.</p>
+                <p><span class="story-label">impact</span>Onboarding dropped to <strong>~6 hours</strong>, a ~95% reduction. Go-live in a day instead of a month.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">1wk → 1d</span>
+                <p>LLM template engine parsing <strong>40+ client document formats</strong> with zero per-client code</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Every client formats legal documents differently. Supporting a new client's templates took an engineer a week of hand-written parsing rules.</p>
+                <p><span class="story-label">built</span>An LLM powered template engine that reads a client's documents and derives the structure itself, no per-client parsing code.</p>
+                <p><span class="story-label">impact</span><strong>40+ client formats</strong> supported; new client setup collapsed from a week to <strong>1 day</strong>.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">agentic</span>
+                <p><strong>Claude based agent</strong> that reviews every PR and closes small debug tickets on its own</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Senior engineers were losing hours to routine PR review and a steady drip of small debug tickets.</p>
+                <p><span class="story-label">built</span>A Claude based agentic workflow that reviews every PR automatically and picks up small, well-scoped tickets end to end: reproduce, fix, open a PR.</p>
+                <p><span class="story-label">impact</span>Routine review happens on every PR without waiting for a human. Senior time goes to the hard problems.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">−90%</span>
+                <p>Manual reporting eliminated via a <strong>real time analytics dashboard</strong> for 7K+ users</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Client-facing teams compiled usage and case reports by hand, every reporting cycle, for thousands of users.</p>
+                <p><span class="story-label">built</span>A React.js real time analytics dashboard fed by live platform data.</p>
+                <p><span class="story-label">impact</span><strong>7K+ users</strong> self-serve their numbers; manual reporting overhead down <strong>~90%</strong>.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">20+</span>
+                <p><strong>Production incidents</strong> handled as first responder · mentoring 2 interns</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>When production breaks on a platform lawyers rely on for court deadlines, minutes matter and someone has to own it end to end.</p>
+                <p><span class="story-label">built</span>A first responder habit: triage, communicate, fix, write the postmortem. Plus onboarding docs and mentoring so the next person is faster.</p>
+                <p><span class="story-label">impact</span><strong>20+ incidents</strong> resolved, and 2 interns growing into engineers who can take the pager.</p>
+              </div>
+            </details>
+          </div>
+          <div class="work-tags mono"><span>Elasticsearch</span><span>Node.js</span><span>Claude API</span><span>Redis</span><span>React</span><span>Vue</span></div>
+        </article>
+
+        <article class="work-card spot reveal">
+          <header class="work-head">
+            <div>
+              <h3>Software Developer Intern</h3>
+              <p class="company mono">Provakil Technologies · Pune</p>
+            </div>
+            <span class="period mono">Jan 2025 - Jun 2025</span>
+          </header>
+          <p class="work-lede">Promoted to full time in 6 months.</p>
+          <div class="impact-grid">
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">100K+/mo</span>
+                <p><strong>WhatsApp notification microservice</strong>: RabbitMQ DLQs, retries, idempotency</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Court hearing alerts cannot be lost. A missed notification can mean a missed hearing, and the old flow had no retry story and no failure visibility.</p>
+                <p><span class="story-label">built</span>A RabbitMQ backed microservice with dead letter queues, exponential retries, and idempotency keys so retried sends never duplicate.</p>
+                <p><span class="story-label">impact</span><strong>100K+ (1L+) messages a month</strong> with full failure visibility, owned end to end as an intern.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">1% → 0.01%</span>
+                <p>Upload error rate, by unifying <strong>MinIO + AWS S3</strong> behind one storage service</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Some clients run on-prem (MinIO), some in cloud (S3). Two storage code paths meant inconsistent behavior and ~1% upload errors on legal documents.</p>
+                <p><span class="story-label">built</span>One storage abstraction with a single API and uniform retry and validation logic, backend chosen per deployment.</p>
+                <p><span class="story-label">impact</span>Upload error rate cut <strong>~100×, to under 0.01%</strong>, on documents that legally cannot go missing.</p>
+              </div>
+            </details>
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">on-prem</span>
+                <p><strong>Docker deployments</strong> for enterprise clients who keep legal data in-house</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Banks and pharma clients will not let legal data leave their own infrastructure, so cloud-only deployment was a dealbreaker.</p>
+                <p><span class="story-label">built</span>Per-client isolated Docker deployments, configured and debugged remotely and on site.</p>
+                <p><span class="story-label">impact</span>Enterprise deals stayed on the table that cloud-only competitors could not serve.</p>
+              </div>
+            </details>
+          </div>
+          <div class="work-tags mono"><span>RabbitMQ</span><span>Node.js</span><span>S3 / MinIO</span><span>Docker</span></div>
+        </article>
+
+        <article class="work-card spot reveal">
+          <header class="work-head">
+            <div>
+              <h3>React Developer Intern</h3>
+              <p class="company mono">Celebal Technologies · Jaipur</p>
+            </div>
+            <span class="period mono">May 2024 - Jul 2024</span>
+          </header>
+          <div class="impact-grid">
+            <details class="impact">
+              <summary>
+                <span class="impact-metric mono">5+ modules</span>
+                <p>Reusable <strong>React components</strong> with Context API and useReducer, adopted across teams</p>
+                <span class="impact-more mono" aria-hidden="true">story <i class="chev">▾</i></span>
+              </summary>
+              <div class="impact-story">
+                <p><span class="story-label">problem</span>Five interconnected modules were each rebuilding the same UI state logic in slightly different ways.</p>
+                <p><span class="story-label">built</span>Reusable React components with shared Context API and useReducer patterns.</p>
+                <p><span class="story-label">impact</span>Adopted across <strong>5+ modules</strong>. My first taste of writing code other teams depend on.</p>
+              </div>
+            </details>
+          </div>
+          <div class="work-tags mono"><span>React</span><span>Context API</span></div>
+        </article>
+
+      </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section" id="projects">
+      <h2 class="section-title reveal"><span class="mono section-num">03</span>Projects</h2>
+      <p class="section-sub reveal">Things I build after hours, mostly tools I wished existed at work.</p>
+
+      <div class="proj-grid">
+
+        <article class="proj proj-feature spot reveal">
+          <div class="proj-top">
+            <span class="proj-status mono"><span class="pulse-dot"></span> live</span>
+            <div class="proj-links">
+              <a href="https://financetracker-raja.vercel.app" target="_blank" rel="noopener" aria-label="Live site">↗</a>
+            </div>
+          </div>
+          <h3>Finance Tracker</h3>
+          <p class="proj-hook mono">snap a receipt → logged, categorized, budgeted</p>
+          <p>Full stack AI finance app. 15+ REST APIs with rate limiting and pagination holding <strong>&lt;200ms p98</strong>; Gemini OCR reads receipts and categorizes spend; Inngest crons ship monthly reports and budget alerts.</p>
+          <div class="work-tags mono"><span>Next.js 15</span><span>PostgreSQL</span><span>Prisma</span><span>Gemini</span><span>Inngest</span></div>
+        </article>
+
+        <article class="proj spot reveal">
+          <div class="proj-top">
+            <span class="proj-status mono">open source</span>
+            
+          </div>
+          <h3>QueueScope</h3>
+          <p class="proj-hook mono">x-ray vision for RabbitMQ</p>
+          <p>CLI + dashboard for RabbitMQ observability: watches dead letter queues, diffs message payloads, and replays failures one keypress at a time. Born from running 100K+ msgs/month in production.</p>
+          <div class="work-tags mono"><span>TypeScript</span><span>RabbitMQ</span><span>CLI</span></div>
+        </article>
+
+        <article class="proj spot reveal">
+          <div class="proj-top">
+            <span class="proj-status mono">open source</span>
+            
+          </div>
+          <h3>PromptPipe</h3>
+          <p class="proj-hook mono">LLM calls that fail gracefully</p>
+          <p>A tiny TypeScript library for production LLM workflows: provider fallbacks (Claude → GPT → Gemini), schema-validated outputs, retries with backoff, and per-call cost tracking.</p>
+          <div class="work-tags mono"><span>TypeScript</span><span>Claude API</span><span>Zod</span></div>
+        </article>
+
+        <article class="proj spot reveal">
+          <div class="proj-top">
+            <span class="proj-status mono">experiment</span>
+            
+          </div>
+          <h3>CaseGraph</h3>
+          <p class="proj-hook mono">case law as a network</p>
+          <p>Citation graph explorer for Indian case law: ingests judgments, extracts citation edges, and ranks precedent influence. Graph queries served from precomputed adjacency lists in Redis at sub-100ms.</p>
+          <div class="work-tags mono"><span>Node.js</span><span>Elasticsearch</span><span>Redis</span><span>D3</span></div>
+        </article>
+
+        <article class="proj spot reveal">
+          <div class="proj-top">
+            <span class="proj-status mono">full stack</span>
+            
+          </div>
+          <h3>Stock Portfolio Platform</h3>
+          <p class="proj-hook mono">market API dies → prices keep flowing</p>
+          <p>Stock tracker built for upstream failure: Upstox API with Yahoo Finance fallback and last-known-price caching. MongoDB time series schema with indexed range queries cut view responses ~25%.</p>
+          <div class="work-tags mono"><span>React</span><span>Node.js</span><span>MongoDB</span><span>Chart.js</span></div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section contact" id="contact">
+      <p class="mono contact-eyebrow reveal"><span class="pulse-dot"></span> currently open to new roles</p>
+      <h2 class="contact-title reveal">Need someone who ships<br /><span class="gradient-text">measurable results?</span></h2>
+      <p class="contact-copy reveal">
+        Search that got 100× faster. Onboarding that got 95% shorter. Error rates cut 100×.
+        If your team has problems like these, I'd love to hear about them.
+      </p>
+      <div class="hero-actions contact-actions reveal">
+        <a href="mailto:sodani.raja11@gmail.com" class="btn btn-primary btn-lg">sodani.raja11@gmail.com</a>
+      </div>
+      <div class="contact-social reveal">
+        <a href="https://github.com/RajaSodani" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg>
+        </a>
+        <a href="https://linkedin.com/in/raja-sodani11" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer mono">
+    <span>© Raja Sodani · Pune, India</span>
+    <span>designed &amp; built from scratch · no frameworks</span>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
