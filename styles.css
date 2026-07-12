@@ -805,3 +805,99 @@ html.js .reveal.visible { opacity: 1; transform: none; }
   .pipe-producer { align-self: flex-start; }
   .footer { justify-content: center; text-align: center; }
 }
+
+
+/* ============ batch: form · chips · pulse · burger · es query ============ */
+
+/* pulse on stat change */
+.pipe-stats b, .rl-readout b { display: inline-block; }
+.pop { animation: statPop 0.4s ease; }
+@keyframes statPop {
+  35% { transform: scale(1.5); text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.9); }
+}
+
+/* rate limit status chips */
+.rl-chip {
+  padding: 0.22rem 0.65rem; border-radius: 999px;
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  background: var(--accent-soft);
+}
+.rl-chip.rl-bad {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* search suggestion chips */
+.try-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.85rem; }
+.try-chip {
+  font-family: var(--font-mono); font-size: 0.75rem;
+  padding: 0.28rem 0.7rem; border-radius: 999px;
+  color: var(--accent); background: var(--accent-soft);
+  border: 1px solid rgba(var(--accent-rgb), 0.25); cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.try-chip:hover { transform: translateY(-2px); background: rgba(var(--accent-rgb), 0.2); }
+.try-chips.inline { display: inline-flex; margin: 0; }
+.search-results .r-empty { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
+
+/* es query panel */
+.es-query {
+  display: none; margin-top: 0.85rem;
+  background: var(--well); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.9rem 1.05rem; font-size: 0.74rem; line-height: 1.75;
+  color: var(--text-muted); white-space: pre; overflow-x: auto;
+}
+.es-query.open { display: block; }
+
+/* contact form */
+.contact-form {
+  max-width: 560px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 0.8rem; text-align: left;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.contact-form input, .contact-form textarea {
+  background: var(--well); border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.75rem 0.95rem; color: var(--text);
+  font-family: var(--font-body); font-size: 0.95rem;
+  outline: none; resize: vertical; width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--text-muted); }
+.contact-form input:focus, .contact-form textarea:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.15);
+}
+.contact-form .btn { align-self: center; margin-top: 0.4rem; }
+.contact-form .honey { position: absolute; left: -9999px; opacity: 0; height: 0; }
+.form-alt { margin-top: 1.1rem; font-size: 0.78rem; color: var(--text-muted); }
+.form-alt a { color: var(--accent); text-decoration: none; }
+.form-alt a:hover { text-decoration: underline; }
+
+/* mobile menu */
+.nav-burger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 6px;
+}
+.nav-burger span {
+  width: 22px; height: 2px; background: var(--text); border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+@media (max-width: 700px) {
+  .nav-burger { display: flex; }
+  .nav-links {
+    display: flex; position: fixed; top: var(--nav-h); left: 0; right: 0;
+    flex-direction: column; align-items: center; gap: 1.4rem;
+    padding: 1.8rem 0 2.2rem;
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transform: translateY(-140%); transition: transform 0.3s ease;
+  }
+  .nav-links.open { transform: translateY(0); }
+  .nav.menu-open .nav-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav.menu-open .nav-burger span:nth-child(2) { opacity: 0; }
+  .nav.menu-open .nav-burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .form-row { grid-template-columns: 1fr; }
+  .demo-head { flex-direction: column; }
+}

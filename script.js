@@ -166,6 +166,22 @@ const onScroll = () => {
 window.addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 
+/* ---------- mobile menu ---------- */
+const navBurger = document.getElementById("navBurger");
+const navLinksEl = document.querySelector(".nav-links");
+navBurger.addEventListener("click", () => {
+  const open = navLinksEl.classList.toggle("open");
+  nav.classList.toggle("menu-open", open);
+  navBurger.setAttribute("aria-expanded", String(open));
+});
+navLinksEl.addEventListener("click", (e) => {
+  if (e.target.tagName === "A") {
+    navLinksEl.classList.remove("open");
+    nav.classList.remove("menu-open");
+    navBurger.setAttribute("aria-expanded", "false");
+  }
+});
+
 /* ---------- reveal ---------- */
 const revealObserver = new IntersectionObserver(
   (entries) => {
@@ -275,6 +291,43 @@ const queryIndex = (query) => {
     .slice(0, 6);
 };
 
+const TRY_WORDS = ["bank", "tax", "property", "pune", "insolvency", "bnak"];
+const tryChipsEl = document.getElementById("tryChips");
+const makeChip = (w) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "try-chip mono";
+  b.textContent = w;
+  b.addEventListener("click", () => {
+    searchInput.value = w;
+    runRace(w);
+  });
+  return b;
+};
+TRY_WORDS.forEach((w) => tryChipsEl.appendChild(makeChip(w)));
+
+const esToggleBtn = document.getElementById("esToggleBtn");
+const esQueryEl = document.getElementById("esQuery");
+let lastQuery = "";
+const renderEsQuery = () => {
+  const dsl = {
+    query: {
+      multi_match: {
+        query: lastQuery || "your query",
+        fields: ["title^3", "court", "parties"],
+        fuzziness: "AUTO",
+      },
+    },
+    highlight: { fields: { title: {} } },
+    size: 6,
+  };
+  esQueryEl.innerHTML = JSON.stringify(dsl, null, 2).split("\n").map(colorJsonLine).join("\n");
+};
+esToggleBtn.addEventListener("click", () => {
+  const open = esQueryEl.classList.toggle("open");
+  if (open) renderEsQuery();
+});
+
 let raceToken = 0;
 let scanRaf = null;
 
@@ -285,8 +338,8 @@ const resetRace = () => {
   scanFill.style.width = "0%";
   esLatency.textContent = "";
   scanLatency.textContent = "";
-  esNote.textContent = "idle";
-  scanNote.textContent = "idle";
+  esNote.textContent = "Idle";
+  scanNote.textContent = "Idle";
   raceVerdict.textContent = "";
   searchResults.innerHTML = "";
 };
@@ -319,10 +372,15 @@ const renderResults = (hits, query) => {
   });
   if (!hits.length) {
     const li = document.createElement("li");
+    li.className = "r-empty";
+    const chips = document.createElement("span");
+    chips.className = "try-chips inline";
+    TRY_WORDS.forEach((w) => chips.appendChild(makeChip(w)));
     const t = document.createElement("span");
     t.className = "r-title";
-    t.textContent = 'No matches. Try "bank", "tax", "property", or a typo like "bnak"';
+    t.textContent = 'No matches in the demo index. Try:';
     li.appendChild(t);
+    li.appendChild(chips);
     searchResults.appendChild(li);
   }
 };
@@ -335,6 +393,8 @@ const runRace = (rawQuery) => {
   if (!query) return;
 
   const hits = queryIndex(query);
+  lastQuery = query;
+  if (esQueryEl.classList.contains("open")) renderEsQuery();
   const esMs = 3 + Math.random() * 6;
   const scanMs = 2600 + Math.random() * 900; // simulated full-scan wall time
 
@@ -349,18 +409,18 @@ const runRace = (rawQuery) => {
     if (token !== raceToken) return;
     esFill.style.width = "100%";
     esLatency.textContent = `${esMs.toFixed(1)}ms`;
-    esNote.textContent = `inverted index lookup · ${hits.length} hit${hits.length === 1 ? "" : "s"} ranked`;
+    esNote.textContent = `Inverted index lookup · ${hits.length} hit${hits.length === 1 ? "" : "s"} ranked`;
     renderResults(hits, query);
   };
   reducedMotion ? esDone() : setTimeout(esDone, psteps.length * stepDelay + 80);
 
   // slow lane: grind through 500K docs
-  scanNote.textContent = "scanning 0 / 500,000 docs";
+  scanNote.textContent = "Scanning 0 / 500,000 docs";
   if (reducedMotion) {
     scanFill.style.width = "100%";
     scanLatency.textContent = `${(scanMs / 1000).toFixed(1)}s`;
-    scanNote.textContent = "scanned 500,000 / 500,000 docs";
-    raceVerdict.textContent = `⚡ inverted index was ~${Math.round(scanMs / esMs).toLocaleString()}× faster`;
+    scanNote.textContent = "Scanned 500,000 / 500,000 docs";
+    raceVerdict.textContent = `⚡ Inverted index ~${Math.round(scanMs / esMs).toLocaleString()}× faster`;
     return;
   }
   const t0 = performance.now();
@@ -369,13 +429,13 @@ const runRace = (rawQuery) => {
     const p = Math.min((now - t0) / scanMs, 1);
     const docs = Math.floor(p * 500000);
     scanFill.style.width = `${p * 100}%`;
-    scanNote.textContent = `scanning ${docs.toLocaleString()} / 500,000 docs`;
+    scanNote.textContent = `Scanning ${docs.toLocaleString()} / 500,000 docs`;
     if (p < 1) {
       scanRaf = requestAnimationFrame(scanStep);
     } else {
       scanLatency.textContent = `${(scanMs / 1000).toFixed(1)}s`;
-      scanNote.textContent = `scanned 500,000 / 500,000 docs · same ${hits.length} result${hits.length === 1 ? "" : "s"}… eventually`;
-      raceVerdict.textContent = `⚡ inverted index was ~${Math.round(scanMs / esMs).toLocaleString()}× faster. This is why search went from minutes to <1s`;
+      scanNote.textContent = `Scanned 500,000 / 500,000 docs · same ${hits.length} result${hits.length === 1 ? "" : "s"}… eventually`;
+      raceVerdict.textContent = `⚡ Inverted index ~${Math.round(scanMs / esMs).toLocaleString()}× faster. This is why search went from minutes to <1s`;
     }
   };
   scanRaf = requestAnimationFrame(scanStep);
@@ -400,18 +460,27 @@ const statHealth = document.getElementById("statHealth");
 const qState = { done: 0, retry: 0, dlq: 0, dead: -1 };
 consumers.forEach((c) => c.classList.add("ok"));
 
+const setStat = (el, v) => {
+  const s = String(v);
+  if (el.textContent === s) return;
+  el.textContent = s;
+  el.classList.remove("pop");
+  void el.offsetWidth;
+  el.classList.add("pop");
+};
+
 const renderStats = () => {
-  statDone.textContent = qState.done;
-  statRetry.textContent = qState.retry;
-  statDlq.textContent = qState.dlq;
+  setStat(statDone, qState.done);
+  setStat(statRetry, qState.retry);
+  setStat(statDlq, qState.dlq);
   if (qState.dead >= 0) {
-    statHealth.textContent = `● worker-${qState.dead + 1} down, retrying → DLQ`;
+    statHealth.textContent = `● Worker-${qState.dead + 1} down, retrying → DLQ`;
     statHealth.className = "stat-bad";
   } else if (qState.dlq > 0) {
-    statHealth.textContent = "● consumers healthy, draining DLQ";
+    statHealth.textContent = "● Consumers healthy, draining DLQ";
     statHealth.className = "stat-ok";
   } else {
-    statHealth.textContent = "● all consumers healthy";
+    statHealth.textContent = "● All consumers healthy";
     statHealth.className = "stat-ok";
   }
 };
@@ -691,13 +760,13 @@ const RL_ENDPOINTS = ["/api/cases/search", "/api/notify/whatsapp", "/api/templat
 
 const renderBucket = () => {
   tokenEls.forEach((t, i) => t.classList.toggle("spent", i >= rl.tokens));
-  rlTokensEl.textContent = rl.tokens;
-  rl200El.textContent = rl.ok;
-  rl429El.textContent = rl.rejected;
-  if (rl.streak429 >= 6) rlMsgEl.textContent = "the bucket holds. it always holds.";
-  else if (rl.tokens === 0) rlMsgEl.textContent = "drained. refilling 2/s, backend untouched";
-  else if (rl.tokens === BUCKET_CAP) rlMsgEl.textContent = "bucket full. fire away";
-  else rlMsgEl.textContent = "refilling…";
+  setStat(rlTokensEl, rl.tokens);
+  setStat(rl200El, rl.ok);
+  setStat(rl429El, rl.rejected);
+  if (rl.streak429 >= 6) rlMsgEl.textContent = "The bucket holds. It always holds.";
+  else if (rl.tokens === 0) rlMsgEl.textContent = "Drained. Refilling 2/s, backend untouched";
+  else if (rl.tokens === BUCKET_CAP) rlMsgEl.textContent = "Bucket full. Every API I ship is rate limited.";
+  else rlMsgEl.textContent = "Refilling…";
 };
 
 const rlLogLine = (okStatus) => {
