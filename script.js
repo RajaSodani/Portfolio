@@ -7,23 +7,6 @@ document.documentElement.classList.add("js");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = window.matchMedia("(pointer: fine)").matches;
 
-/* ---------- theme switcher ---------- */
-const THEMES = ["sunset", "cyan", "violet", "emerald"];
-const savedTheme = localStorage.getItem("theme-v2");
-if (savedTheme && THEMES.includes(savedTheme)) {
-  document.documentElement.setAttribute("data-theme", savedTheme);
-}
-const themeButtons = document.querySelectorAll(".tdot");
-const setTheme = (name) => {
-  document.documentElement.setAttribute("data-theme", name);
-  localStorage.setItem("theme-v2", name);
-  themeButtons.forEach((b) => b.classList.toggle("active", b.dataset.settheme === name));
-};
-themeButtons.forEach((btn) => btn.addEventListener("click", () => setTheme(btn.dataset.settheme)));
-themeButtons.forEach((b) =>
-  b.classList.toggle("active", b.dataset.settheme === document.documentElement.getAttribute("data-theme"))
-);
-
 /* ---------- light / dark mode ---------- */
 const modeToggle = document.getElementById("modeToggle");
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -40,8 +23,18 @@ const applyMode = (mode) => {
 };
 const toggleMode = () => {
   const next = document.documentElement.getAttribute("data-mode") === "light" ? "dark" : "light";
-  localStorage.setItem("mode-v2", next); // explicit choice persists
-  applyMode(next);
+  try { localStorage.setItem("mode-v2", next); } catch {} // explicit choice persists
+  if (!document.startViewTransition || reducedMotion) return applyMode(next);
+  // circular reveal growing out of the toggle button
+  const r = modeToggle.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  document.startViewTransition(() => applyMode(next)).ready.then(() => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration: 550, easing: "cubic-bezier(0.4, 0, 0.2, 1)", pseudoElement: "::view-transition-new(root)" }
+    );
+  });
 };
 modeToggle.addEventListener("click", toggleMode);
 applyMode(localStorage.getItem("mode-v2") || systemMode());
@@ -91,12 +84,10 @@ const COMMANDS = [
   { icon: "↗", label: "Open GitHub", run: () => window.open("https://github.com/RajaSodani", "_blank") },
   { icon: "↗", label: "Open LinkedIn", run: () => window.open("https://linkedin.com/in/raja-sodani11", "_blank") },
   { icon: "✉", label: "Email me", run: () => (location.href = "mailto:sodani.raja11@gmail.com") },
+  { icon: "✦", label: "Ask AI about Raja", run: () => setTimeout(openChat) },
   { icon: "↗", label: "Open resume", run: () => window.open("resume.pdf", "_blank") },
+  { icon: "↗", label: "Open PromptPipe on GitHub", run: () => window.open("https://github.com/RajaSodani/promptpipe", "_blank") },
   { icon: "◑", label: "Toggle light / dark mode", run: () => toggleMode() },
-  { icon: "◐", label: "Theme: Sunset", run: () => setTheme("sunset") },
-  { icon: "◐", label: "Theme: Cyan", run: () => setTheme("cyan") },
-  { icon: "◐", label: "Theme: Violet", run: () => setTheme("violet") },
-  { icon: "◐", label: "Theme: Emerald", run: () => setTheme("emerald") },
 ];
 
 let palSel = 0;
@@ -143,6 +134,7 @@ document.addEventListener("keydown", (e) => {
     paletteBackdrop.hidden ? openPalette() : closePalette();
     return;
   }
+  if (e.key === "Escape" && !chatPanel.hidden && paletteBackdrop.hidden) return closeChat();
   if (paletteBackdrop.hidden) return;
   if (e.key === "Escape") return closePalette();
   if (e.key === "ArrowDown") { e.preventDefault(); palSel = Math.min(palSel + 1, palFiltered.length - 1); renderSel(); }
@@ -208,6 +200,229 @@ if (finePointer && !reducedMotion) {
       card.style.setProperty("--my", `${e.clientY - r.top}px`);
     });
   });
+}
+
+/* ---------- hero canvas: drifting nodes that link up near the cursor ---------- */
+// Reads like an index graph. Paused off screen and in background tabs; skipped for reduced motion.
+const heroCanvas = document.getElementById("heroCanvas");
+if (heroCanvas && !reducedMotion) {
+  const ctx = heroCanvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let w = 0, h = 0, nodes = [], running = false, raf = 0;
+  const pointer = { x: -1e4, y: -1e4 };
+  const LINK = 130;
+
+  const accent = () => getComputedStyle(document.documentElement).getPropertyValue("--accent-rgb").trim();
+  let rgb = accent();
+  new MutationObserver(() => (rgb = accent())).observe(document.documentElement, { attributes: true, attributeFilter: ["data-mode"] });
+
+  const resize = () => {
+    const r = heroCanvas.getBoundingClientRect();
+    w = r.width; h = r.height;
+    heroCanvas.width = w * dpr; heroCanvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.round(Math.min(90, (w * h) / 16000));
+    nodes = Array.from({ length: count }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+      r: 1 + Math.random() * 1.4,
+    }));
+  };
+
+  const frame = () => {
+    ctx.clearRect(0, 0, w, h);
+    for (const n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > w) n.vx *= -1;
+      if (n.y < 0 || n.y > h) n.vy *= -1;
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      const pd = Math.hypot(a.x - pointer.x, a.y - pointer.y);
+      const near = Math.max(0, 1 - pd / 220);
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d > LINK) continue;
+        ctx.strokeStyle = `rgba(${rgb}, ${(1 - d / LINK) * (0.08 + near * 0.45)})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+      ctx.fillStyle = `rgba(${rgb}, ${0.25 + near * 0.6})`;
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r + near * 1.5, 0, Math.PI * 2); ctx.fill();
+    }
+    raf = requestAnimationFrame(frame);
+  };
+
+  const setRunning = (on) => {
+    if (on === running) return;
+    running = on;
+    if (on) raf = requestAnimationFrame(frame);
+    else cancelAnimationFrame(raf);
+  };
+
+  let visible = true;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; setRunning(visible && !document.hidden); }).observe(heroCanvas);
+  document.addEventListener("visibilitychange", () => setRunning(visible && !document.hidden));
+  window.addEventListener("pointermove", (e) => {
+    const r = heroCanvas.getBoundingClientRect();
+    pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
+  }, { passive: true });
+  let resizeTimer;
+  window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 150); });
+
+  resize();
+  setRunning(true);
+  requestAnimationFrame(() => heroCanvas.classList.add("ready"));
+}
+
+/* ---------- AI chat ---------- */
+// Streams NDJSON from /api/chat (see api/chat.js). All text goes in via textContent.
+const chatPanel = document.getElementById("chatPanel");
+const chatLauncher = document.getElementById("chatLauncher");
+const chatLog = document.getElementById("chatLog");
+const chatForm = document.getElementById("chatForm");
+const chatInput = document.getElementById("chatInput");
+const chatChips = document.getElementById("chatChips");
+const chatSend = chatForm.querySelector(".chat-send");
+const CHAT_KEY = "chat-v1";
+const CHAT_GREETING = "Hi! I'm an AI assistant that answers questions about Raja's work, projects and experience. What would you like to know?";
+const CHAT_OFFLINE = "The AI is offline right now. You can reach Raja directly at sodani.raja11@gmail.com.";
+
+let chatHistory = [];
+let chatBusy = false;
+try { chatHistory = JSON.parse(sessionStorage.getItem(CHAT_KEY)) || []; } catch {}
+const saveChat = () => { try { sessionStorage.setItem(CHAT_KEY, JSON.stringify(chatHistory.slice(-20))); } catch {} };
+
+const addMsg = (role, text, meta) => {
+  const el = document.createElement("div");
+  el.className = `cmsg cmsg-${role === "user" ? "user" : "bot"}`;
+  el.textContent = text;
+  if (meta) {
+    const m = document.createElement("span");
+    m.className = "cmsg-meta";
+    m.textContent = meta;
+    el.appendChild(m);
+  }
+  chatLog.appendChild(el);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  return el;
+};
+
+const renderChat = () => {
+  chatLog.innerHTML = "";
+  addMsg("assistant", CHAT_GREETING);
+  for (const m of chatHistory) addMsg(m.role, m.content, m.meta);
+  chatChips.hidden = chatHistory.length > 0;
+};
+
+function openChat() {
+  if (!chatPanel.hidden) return chatInput.focus();
+  renderChat();
+  chatPanel.hidden = false;
+  chatLauncher.classList.add("hidden");
+  chatLauncher.setAttribute("aria-expanded", "true");
+  chatInput.focus({ preventScroll: true });
+}
+function closeChat() {
+  chatPanel.hidden = true;
+  chatLauncher.classList.remove("hidden");
+  chatLauncher.setAttribute("aria-expanded", "false");
+  chatLauncher.focus({ preventScroll: true });
+}
+
+document.querySelectorAll("[data-chat-open]").forEach((b) => b.addEventListener("click", openChat));
+document.getElementById("chatClose").addEventListener("click", closeChat);
+document.getElementById("chatReset").addEventListener("click", () => {
+  if (chatBusy) return;
+  chatHistory = [];
+  saveChat();
+  renderChat();
+  chatInput.focus();
+});
+chatChips.addEventListener("click", (e) => {
+  if (e.target.matches(".try-chip")) askChat(e.target.textContent);
+});
+chatForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  askChat(chatInput.value);
+});
+
+async function askChat(raw) {
+  const question = raw.trim();
+  if (!question || chatBusy) return;
+  chatBusy = true;
+  chatSend.disabled = true;
+  chatInput.value = "";
+  chatChips.hidden = true;
+
+  chatHistory.push({ role: "user", content: question });
+  addMsg("user", question);
+  const bubble = addMsg("assistant", "");
+  bubble.innerHTML = '<span class="cmsg-dots"><i></i><i></i><i></i></span>';
+
+  let answer = "";
+  let meta = "";
+  let failed = "";
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ messages: chatHistory.map(({ role, content }) => ({ role, content })) }),
+    });
+    if (!res.ok || !res.body) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(res.status === 429 ? body.error : CHAT_OFFLINE);
+    }
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += value;
+      let nl;
+      while ((nl = buffer.indexOf("\n")) !== -1) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line) continue;
+        const evt = JSON.parse(line);
+        if (evt.t) {
+          answer += evt.t;
+          bubble.textContent = answer;
+          bubble.classList.add("cmsg-typing");
+          chatLog.scrollTop = chatLog.scrollHeight;
+        } else if (evt.done) {
+          meta = `${evt.done.provider} · ${(evt.done.ms / 1000).toFixed(1)}s`;
+        } else if (evt.error) {
+          failed = CHAT_OFFLINE;
+        }
+      }
+    }
+    if (!answer && !failed) failed = CHAT_OFFLINE;
+  } catch (err) {
+    failed = err.message && err.message !== "Failed to fetch" ? err.message : CHAT_OFFLINE;
+  }
+
+  bubble.classList.remove("cmsg-typing");
+  if (failed && !answer) {
+    chatHistory.pop(); // let the visitor retry the same question
+    bubble.textContent = failed;
+    bubble.classList.add("cmsg-error");
+  } else {
+    chatHistory.push({ role: "assistant", content: answer, meta });
+    bubble.textContent = answer;
+    if (meta) {
+      const m = document.createElement("span");
+      m.className = "cmsg-meta";
+      m.textContent = meta;
+      bubble.appendChild(m);
+    }
+  }
+  saveChat();
+  chatLog.scrollTop = chatLog.scrollHeight;
+  chatBusy = false;
+  chatSend.disabled = false;
+  if (!matchMedia("(max-width: 700px)").matches) chatInput.focus();
 }
 
 /* ============================================================

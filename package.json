@@ -1,0 +1,12 @@
+{
+  "name": "rajasodani-portfolio",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "CHAT_MOCK=1 node dev-server.mjs"
+  },
+  "dependencies": {
+    "promptpipe": "git+https://github.com/RajaSodani/promptpipe.git#7a6afdf99f08559cad3dbe72384f4b540add070a"
+  }
+}
