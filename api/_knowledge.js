@@ -56,7 +56,7 @@ Promoted to full time within 6 months.
 
 ## Projects
 - PromptPipe (open source, github.com/RajaSodani/promptpipe): a TypeScript library for production
-  LLM calls. Provider fallbacks (Gemini, Groq, Claude, any OpenAI compatible API), schema validated
+  LLM calls. Provider fallbacks (OpenAI, Gemini, Groq, Claude, any OpenAI compatible API), schema validated
   output with automatic re-asking, retries with exponential backoff, per-call cost tracking, and
   streaming that only falls back before the first token. This chat runs on PromptPipe.
 - Finance Tracker (live at financetracker-raja.vercel.app): full stack AI finance app on Next.js,

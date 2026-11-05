@@ -4,11 +4,13 @@
 //   {"error":"message"}                  final line on failure
 //
 // Providers come from environment variables (set them in Vercel → Settings → Environment Variables):
-//   GEMINI_API_KEY   primary  (free tier at aistudio.google.com)
+//   OPENAI_API_KEY   primary  (platform.openai.com/api-keys)
+//   GEMINI_API_KEY   fallback (free tier at aistudio.google.com), optional
 //   GROQ_API_KEY     fallback (free tier at console.groq.com), optional
+// Whichever keys are set are tried in that order.
 //   CHAT_MOCK=1      local development without any keys
 
-import { createPipe, gemini, groq, mock } from "promptpipe";
+import { createPipe, gemini, groq, mock, openai } from "promptpipe";
 import { SYSTEM_PROMPT } from "./_knowledge.js";
 
 const MAX_TURNS = 8;
@@ -47,6 +49,9 @@ function originAllowed(origin) {
 
 function buildPipe() {
   const providers = [];
+  if (process.env.OPENAI_API_KEY) {
+    providers.push(openai({ apiKey: process.env.OPENAI_API_KEY, model: process.env.OPENAI_MODEL || "gpt-4o-mini" }));
+  }
   if (process.env.GEMINI_API_KEY) {
     providers.push(gemini({ apiKey: process.env.GEMINI_API_KEY, model: process.env.GEMINI_MODEL || "gemini-2.5-flash" }));
   }
