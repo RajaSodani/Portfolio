@@ -1,7 +1,7 @@
 // Local preview with the chat API, no Vercel CLI needed.
 //   npm install
 //   CHAT_MOCK=1 node dev-server.mjs                 # fake replies
-//   GEMINI_API_KEY=... node dev-server.mjs          # real replies
+//   OPENAI_API_KEY=... node dev-server.mjs          # real replies
 // then open http://localhost:4175
 
 import { createServer } from "node:http";
